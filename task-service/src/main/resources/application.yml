@@ -1,0 +1,58 @@
+#version: '3.8'
+#services:
+#  mysql:
+#    image: mysql:8
+#    container_name: mysql
+#    environment:
+#      MYSQL_ROOT_PASSWORD: springstudent
+#      MYSQL_DATABASE: todo_db
+#      MYSQL_USER: springstudent
+#      MYSQL_PASSWORD: springstudent
+#    ports:
+#      - "3306:3306"
+#    networks:
+#      - app-network
+#
+#  task-service:
+#    build: .
+#    depends_on:
+#      - mysql
+#    environment:
+#      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/todo_db
+#      SPRING_DATASOURCE_USERNAME: springstudent
+#      SPRING_DATASOURCE_PASSWORD: springstudent
+#    networks:
+#      - app-network
+#
+#networks:
+#  app-network:
+server:
+  port: 8083
+
+spring:
+  application:
+    name: task-service
+
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3306/todo_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true}
+    username: ${SPRING_DATASOURCE_USERNAME:springstudent}
+    password: ${SPRING_DATASOURCE_PASSWORD:springstudent}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    database-platform: org.hibernate.dialect.MySQL8Dialect
+    properties:
+      hibernate:
+        format_sql: true
+
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+
+logging:
+  level:
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
