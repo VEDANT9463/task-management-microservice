@@ -2,6 +2,7 @@ package com.user.service;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -13,29 +14,26 @@ import java.util.Map;
 @Service
 public class JwtService {
 
-    // ✅ Better: allow secret from env if provided
-    private static final String SECRET_KEY =
-            System.getenv().getOrDefault("JWT_SECRET",
-                    "my-secret-key-my-secret-key-my-secret-key");
+    @Value("${jwt.secret}")
+    private String secretKey;
 
-    private static final long EXPIRATION_TIME = 24 * 60 * 60 * 1000; // 24 hours
+    @Value("${jwt.expiration}")
+    private long expirationTime;
 
     private Key getSignInKey() {
-        return Keys.hmacShaKeyFor(SECRET_KEY.getBytes());
+        return Keys.hmacShaKeyFor(secretKey.getBytes());
     }
 
-    // ✅ Clean version for username/email
     public String generateToken(String username) {
         return generateToken(new HashMap<>(), username);
     }
 
-    // ✅ Extendable version with extra claims
     public String generateToken(Map<String, Object> extraClaims, String username) {
         return Jwts.builder()
                 .setClaims(extraClaims)
                 .setSubject(username)
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
+                .setExpiration(new Date(System.currentTimeMillis() + expirationTime))
                 .signWith(getSignInKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
@@ -72,4 +70,5 @@ public class JwtService {
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
-    }}
+    }
+}

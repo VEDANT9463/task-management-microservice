@@ -2,11 +2,12 @@ package com.user.service;
 
 import com.user.entity.User;
 import com.user.repository.UserRepository;
-import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Primary;
 import org.springframework.security.core.userdetails.*;
 import org.springframework.stereotype.Service;
 
 @Service("userDetailsServiceImpl")
+@Primary  // ADD THIS
 public class UserDetailsServiceImpl implements UserDetailsService {
 
     private final UserRepository userRepository;
